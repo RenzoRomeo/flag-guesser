@@ -1,0 +1,19 @@
+{
+  "name": "flag-guesser",
+  "version": "1.0.0",
+  "description": "Flag Guesser Discord Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RenzoRomeo/flag-guesser.git"
+  },
+  "author": "RenzoRomeo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RenzoRomeo/flag-guesser/issues"
+  },
+  "homepage": "https://github.com/RenzoRomeo/flag-guesser#readme"
+}
