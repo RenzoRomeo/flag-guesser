@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/RenzoRomeo/flag-guesser/issues"
   },
-  "homepage": "https://github.com/RenzoRomeo/flag-guesser#readme"
+  "homepage": "https://github.com/RenzoRomeo/flag-guesser#readme",
+  "dependencies": {
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0"
+  }
 }
