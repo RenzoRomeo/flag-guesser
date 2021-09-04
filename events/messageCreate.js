@@ -28,27 +28,32 @@ async function sendFlag(message, country){
 
 async function playFlags(message){
     const correct = Object.keys(flagCodes)[Math.floor(Math.random() * Object.keys(flagCodes).length)];
-    let filter = m => m.author.id === message.author.id;
+    let filter = m => (m.author.id === message.author.id);
     let correctLength = flagCodes[correct].split(" ").length;
     let s = (correctLength>1) ? 's' : '';
-    await message.channel.send({
-        files:[`https://flagcdn.com/256x192/${correct}.png`],
-        content: `${message.author.toString()} Guess this country's name! Hint: ${correctLength} word${s}`
-    })
-    .then(message.channel.awaitMessages({
-        filter,
-        max: 1,
-        time: 30000,
-        errors: ['time']})
-        .then(message => {
-            message = message.first();
-            if (message.content.toLowerCase() === flagCodes[correct].toLowerCase()){
-                message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
-            } else{
-                message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
-            }
-        }).catch(e => console.error(e))
-    );
+    try{
+        await message.channel.send({
+            files:[`https://flagcdn.com/256x192/${correct}.png`],
+            content: `${message.author.toString()} Guess this country's name! Hint: ${correctLength} word${s}`
+        })
+        .then(message.channel.awaitMessages({
+            filter,
+            max: 1,
+            time: 30000,
+            errors: ['time']})
+            .then(message => {
+                message = message.first();
+                if (message.content.toLowerCase() === flagCodes[correct].toLowerCase()){
+                    message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
+                } else{
+                    message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
+                }
+            }).catch(e => console.error(e))
+        );
+    } catch(e) {
+        console.error(e);
+    }
+    
 }
 
 async function showHelp(message){
