@@ -1,3 +1,5 @@
+const { MessageEmbed } = require("discord.js");
+
 function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key].toLowerCase() === value);
 }
@@ -49,14 +51,26 @@ async function playFlags(message){
     );
 }
 
+async function showHelp(message){
+    let embed = new MessageEmbed()
+    .setColor('#0099ff')
+    .setTitle('Flag Guesser Help')
+    .setDescription('List of commands')
+    .addFields(
+        {name: 'f!play', value: 'Play Flag Guesser'},
+        {name: 'f!flag [country code/name]', value: "Show the country's flag "}
+    )
+    await message.channel.send({embeds: [embed]});
+}
+
 module.exports = {
 	name: 'messageCreate',
 	async execute(message) {
-        if (!message.content.startsWith("f!")) return;
+        if (!message.content.toLowerCase().startsWith("f!")) return;
         else{
             // Separar Comando y Contenido en el mensaje
             let stringArr = message.content.split(" ");
-            messageCommand = stringArr[0].substring(2);
+            messageCommand = stringArr[0].substring(2).toLowerCase();
             prefixLength = 2 + messageCommand.length;
             messageContent = stringArr.slice(1).join(" ");
 
@@ -68,6 +82,7 @@ module.exports = {
             else if (messageCommand == "reply") await replyWithHello(message, messageContent);
             else if (messageCommand == "flag") await sendFlag(message, messageContent);
             else if (messageCommand == "play") await playFlags(message);
+            else if (messageCommand == "help") await showHelp(message);
         }
 	},
 };
