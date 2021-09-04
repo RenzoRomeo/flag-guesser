@@ -19,6 +19,30 @@ async function sendFlag(message, countryCode){
     }
 }
 
+async function playFlags(message){
+    const correct = Object.keys(flagCodes)[Math.floor(Math.random() * Object.keys(flagCodes).length)];
+    let filter = m => m.author.id === message.author.id;
+    await message.channel.send({
+        files:[`https://flagcdn.com/256x192/${correct}.png`],
+        content: "Guess this country's name!"
+    })
+    .then(message.channel.awaitMessages({
+        filter,
+        max: 1,
+        time: 30000,
+        errors: ['time']})
+        .then(message => {
+            message = message.first();
+            if (message.content.toLowerCase() === flagCodes[correct].toLowerCase()){
+                message.channel.send("Correct!");
+            } else{
+                message.channel.send("You failed LMAO!");
+            }
+        })
+    )
+}
+
+
 
 module.exports = {
 	name: 'messageCreate',
@@ -36,8 +60,9 @@ module.exports = {
 
             // Detectar comando y llamar función correspondiente
             if (messageCommand == "hola") sayHello(messageConent);
-            else if (messageCommand == "reply") await replyWithHello(message, messageContent)
+            else if (messageCommand == "reply") await replyWithHello(message, messageContent);
             else if (messageCommand == "flag") await sendFlag(message, messageContent);
+            else if (messageCommand == "play") await playFlags(message);
         }
 	},
 };
