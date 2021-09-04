@@ -22,9 +22,11 @@ async function sendFlag(message, countryCode){
 async function playFlags(message){
     const correct = Object.keys(flagCodes)[Math.floor(Math.random() * Object.keys(flagCodes).length)];
     let filter = m => m.author.id === message.author.id;
+    let correctLength = flagCodes[correct].split(" ").length;
+    let s = (correctLength>1) ? 's' : '';
     await message.channel.send({
         files:[`https://flagcdn.com/256x192/${correct}.png`],
-        content: "Guess this country's name!"
+        content: `${message.author.toString()} Guess this country's name! Hint: ${correctLength} word${s}`
     })
     .then(message.channel.awaitMessages({
         filter,
@@ -34,15 +36,13 @@ async function playFlags(message){
         .then(message => {
             message = message.first();
             if (message.content.toLowerCase() === flagCodes[correct].toLowerCase()){
-                message.channel.send("Correct!");
+                message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
             } else{
-                message.channel.send("You failed LMAO!");
+                message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
             }
-        })
-    )
+        }).catch(e => console.error(e))
+    );
 }
-
-
 
 module.exports = {
 	name: 'messageCreate',
@@ -106,12 +106,12 @@ const flagCodes = {
     "by": "Belarus",
     "bz": "Belize",
     "ca": "Canada",
-    "cc": "Cocos (Keeling) Islands",
+    "cc": "Cocos Islands",
     "cd": "DR Congo",
     "cf": "Central African Republic",
     "cg": "Republic of the Congo",
     "ch": "Switzerland",
-    "ci": "Côte d'Ivoire (Ivory Coast)",
+    "ci": "Ivory Coast",
     "ck": "Cook Islands",
     "cl": "Chile",
     "cm": "Cameroon",
@@ -137,7 +137,6 @@ const flagCodes = {
     "er": "Eritrea",
     "es": "Spain",
     "et": "Ethiopia",
-    "eu": "European Union",
     "fi": "Finland",
     "fj": "Fiji",
     "fk": "Falkland Islands",
@@ -152,7 +151,6 @@ const flagCodes = {
     "gb-wls": "Wales",
     "gd": "Grenada",
     "ge": "Georgia",
-    "gf": "French Guiana",
     "gg": "Guernsey",
     "gh": "Ghana",
     "gi": "Gibraltar",
@@ -285,7 +283,7 @@ const flagCodes = {
     "sv": "El Salvador",
     "sx": "Sint Maarten",
     "sy": "Syria",
-    "sz": "Eswatini (Swaziland)",
+    "sz": "Eswatini",
     "tc": "Turks and Caicos Islands",
     "td": "Chad",
     "tf": "French Southern and Antarctic Lands",
@@ -307,59 +305,9 @@ const flagCodes = {
     "um": "United States Minor Outlying Islands",
     "un": "United Nations",
     "us": "United States",
-    "us-ak": "Alaska",
-    "us-al": "Alabama",
-    "us-ar": "Arkansas",
-    "us-az": "Arizona",
-    "us-ca": "California",
-    "us-co": "Colorado",
-    "us-ct": "Connecticut",
-    "us-de": "Delaware",
-    "us-fl": "Florida",
-    "us-ga": "Georgia",
-    "us-hi": "Hawaii",
-    "us-ia": "Iowa",
-    "us-id": "Idaho",
-    "us-il": "Illinois",
-    "us-in": "Indiana",
-    "us-ks": "Kansas",
-    "us-ky": "Kentucky",
-    "us-la": "Louisiana",
-    "us-ma": "Massachusetts",
-    "us-md": "Maryland",
-    "us-me": "Maine",
-    "us-mi": "Michigan",
-    "us-mn": "Minnesota",
-    "us-mo": "Missouri",
-    "us-ms": "Mississippi",
-    "us-mt": "Montana",
-    "us-nc": "North Carolina",
-    "us-nd": "North Dakota",
-    "us-ne": "Nebraska",
-    "us-nh": "New Hampshire",
-    "us-nj": "New Jersey",
-    "us-nm": "New Mexico",
-    "us-nv": "Nevada",
-    "us-ny": "New York",
-    "us-oh": "Ohio",
-    "us-ok": "Oklahoma",
-    "us-or": "Oregon",
-    "us-pa": "Pennsylvania",
-    "us-ri": "Rhode Island",
-    "us-sc": "South Carolina",
-    "us-sd": "South Dakota",
-    "us-tn": "Tennessee",
-    "us-tx": "Texas",
-    "us-ut": "Utah",
-    "us-va": "Virginia",
-    "us-vt": "Vermont",
-    "us-wa": "Washington",
-    "us-wi": "Wisconsin",
-    "us-wv": "West Virginia",
-    "us-wy": "Wyoming",
     "uy": "Uruguay",
     "uz": "Uzbekistan",
-    "va": "Vatican City (Holy See)",
+    "va": "Vatican City",
     "vc": "Saint Vincent and the Grenadines",
     "ve": "Venezuela",
     "vg": "British Virgin Islands",
@@ -375,3 +323,11 @@ const flagCodes = {
     "zm": "Zambia",
     "zw": "Zimbabwe"
 };
+
+const winMessages = [
+    "Correct! 😎",
+]
+
+const failMessages = [
+    "You failed LMAO! 😂",
+]
