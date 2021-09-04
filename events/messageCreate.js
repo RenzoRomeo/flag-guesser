@@ -1,3 +1,7 @@
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key].toLowerCase() === value);
+}
+
 function sayHello(message){
     console.log("Hello "+ message);
 }
@@ -8,13 +12,14 @@ async function replyWithHello(message, messageContent){
     .catch(console.error);
 }
 
-async function sendFlag(message, countryCode){
-    if (!(countryCode in flagCodes)){
-        await message.channel.send("Country code doesn't exist");
+async function sendFlag(message, country){
+    if (!((country in flagCodes) || (Object.values(flagCodes).map(s => s.toLowerCase())).includes(country.toLowerCase()))){
+        await message.channel.send("Invalid country code/name!");
     } else{
+        if (!(country in flagCodes)) country = getKeyByValue(flagCodes,country.toLowerCase());
         await message.channel.send({
-            files:[`https://flagcdn.com/256x192/${countryCode}.png`],
-            content: `${flagCodes[countryCode]}'s flag`,
+            files:[`https://flagcdn.com/256x192/${country}.png`],
+            content: `${flagCodes[country]}'s flag`,
         });
     }
 }
@@ -302,7 +307,6 @@ const flagCodes = {
     "tz": "Tanzania",
     "ua": "Ukraine",
     "ug": "Uganda",
-    "um": "United States Minor Outlying Islands",
     "un": "United Nations",
     "us": "United States",
     "uy": "Uruguay",
