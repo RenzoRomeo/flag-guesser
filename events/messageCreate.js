@@ -77,15 +77,16 @@ module.exports = {
             let stringArr = message.content.split(" ");
             messageCommand = stringArr[0].substring(2).toLowerCase();
             prefixLength = 2 + messageCommand.length;
-            messageContent = stringArr.slice(1).join(" ");
+            // Ahora arguments es un string, pero en el futuro va a ser un array de strings para pasar varios argumentos
+            arguments = stringArr.slice(1).join(" ");
 
-            console.log(messageCommand);
-            console.log(messageContent);
+            console.log('Command: ' + messageCommand);
+            console.log('Arguments: ' + arguments);
 
             // Detectar comando y llamar función correspondiente
             if (messageCommand == "hola") sayHello(messageConent);
-            else if (messageCommand == "reply") await replyWithHello(message, messageContent);
-            else if (messageCommand == "flag") await sendFlag(message, messageContent);
+            else if (messageCommand == "reply") await replyWithHello(message, arguments);
+            else if (messageCommand == "flag") await sendFlag(message, arguments);
             else if (messageCommand == "play") await playFlags(message);
             else if (messageCommand == "help") await showHelp(message);
         }
