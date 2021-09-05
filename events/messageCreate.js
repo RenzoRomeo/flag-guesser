@@ -9,6 +9,7 @@ module.exports = {
             let stringArr = message.content.split(" ");
             messageCommand = stringArr[0].substring(2).toLowerCase();
             prefixLength = 2 + messageCommand.length;
+
             // Ahora arguments es un string, pero en el futuro va a ser un array de strings para pasar varios argumentos
             arguments = stringArr.slice(1).join(" ");
 
@@ -44,14 +45,18 @@ async function replyWithHello(message, messageContent){
 }
 
 async function sendFlag(message, country){
-    if (!((country in flagCodes) || (Object.values(flagCodes).map(s => s.toLowerCase())).includes(country.toLowerCase()))){
-        await message.channel.send("Invalid country code/name!");
+    if (!isPlaying(message.author.id)){
+        if (!((country in flagCodes) || (Object.values(flagCodes).map(s => s.toLowerCase())).includes(country.toLowerCase()))){
+            await message.channel.send("Invalid country code/name!");
+        } else{
+            if (!(country in flagCodes)) country = getKeyByValue(flagCodes,country.toLowerCase());
+            await message.channel.send({
+                files:[`https://flagcdn.com/256x192/${country}.png`],
+                content: `${flagCodes[country]}'s flag`,
+            });
+        }
     } else{
-        if (!(country in flagCodes)) country = getKeyByValue(flagCodes,country.toLowerCase());
-        await message.channel.send({
-            files:[`https://flagcdn.com/256x192/${country}.png`],
-            content: `${flagCodes[country]}'s flag`,
-        });
+        await message.channel.send(`${message.author.toString()} - You can't use that command while playing!`);
     }
 }
 
@@ -59,7 +64,7 @@ async function playFlags(message){
     if (!isPlaying(message.author.id)){
         currentPlayers[message.author.id] = true;
         const correct = Object.keys(flagCodes)[Math.floor(Math.random() * Object.keys(flagCodes).length)];
-        let filter = m => (m.author.id === message.author.id && isPlaying(m.author.id) && m.content.toLowerCase() != 'f!play');
+        let filter = m => (m.author.id === message.author.id && isPlaying(m.author.id) && !['f!play', 'f!flag'].includes(m.content.toLowerCase().split(" ")[0]));
         let correctLength = flagCodes[correct].split(" ").length;
         try{
             await message.channel.send({
