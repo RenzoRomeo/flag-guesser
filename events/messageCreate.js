@@ -1,5 +1,34 @@
 const { MessageEmbed } = require("discord.js");
 
+module.exports = {
+	name: 'messageCreate',
+	async execute(message) {
+        if (!message.content.toLowerCase().startsWith("f!")) return;
+        else{
+            // Separar Comando y Contenido en el mensaje
+            let stringArr = message.content.split(" ");
+            messageCommand = stringArr[0].substring(2).toLowerCase();
+            prefixLength = 2 + messageCommand.length;
+            // Ahora arguments es un string, pero en el futuro va a ser un array de strings para pasar varios argumentos
+            arguments = stringArr.slice(1).join(" ");
+
+            console.log('Command: ' + messageCommand);
+            console.log('Arguments: ' + arguments);
+
+            // Detectar comando y llamar función correspondiente
+            if (messageCommand == "hola") sayHello(messageConent);
+            else if (messageCommand == "reply") await replyWithHello(message, arguments);
+            else if (messageCommand == "flag") await sendFlag(message, arguments);
+            else if (messageCommand == "play") await playFlags(message);
+            else if (messageCommand == "help") await showHelp(message);
+        }
+	},
+};
+
+function isPlaying(authorId){
+    return Object.keys(currentPlayers).includes(authorId);
+}
+
 function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key].toLowerCase() === value);
 }
@@ -27,33 +56,40 @@ async function sendFlag(message, country){
 }
 
 async function playFlags(message){
-    const correct = Object.keys(flagCodes)[Math.floor(Math.random() * Object.keys(flagCodes).length)];
-    let filter = m => (m.author.id === message.author.id);
-    let correctLength = flagCodes[correct].split(" ").length;
-    let s = (correctLength>1) ? 's' : '';
-    try{
-        await message.channel.send({
-            files:[`https://flagcdn.com/256x192/${correct}.png`],
-            content: `${message.author.toString()} Guess this country's name! Hint: ${correctLength} word${s}`
-        })
-        .then(message.channel.awaitMessages({
-            filter,
-            max: 1,
-            time: 30000,
-            errors: ['time']})
-            .then(message => {
-                message = message.first();
-                if (message.content.toLowerCase() === flagCodes[correct].toLowerCase()){
-                    message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
-                } else{
-                    message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
-                }
-            }).catch(e => console.error(e))
-        );
-    } catch(e) {
-        console.error(e);
+    if (!isPlaying(message.author.id)){
+        currentPlayers[message.author.id] = true;
+        const correct = Object.keys(flagCodes)[Math.floor(Math.random() * Object.keys(flagCodes).length)];
+        let filter = m => (m.author.id === message.author.id && isPlaying(m.author.id) && m.content.toLowerCase() != 'f!play');
+        let correctLength = flagCodes[correct].split(" ").length;
+        try{
+            await message.channel.send({
+                files:[`https://flagcdn.com/256x192/${correct}.png`],
+                content: `${message.author.toString()} Guess this country's name! - Hint: ${correctLength} word${(correctLength>1) ? 's' : ''} - You have 10 seconds!`
+            })
+            .then(message.channel.awaitMessages({
+                filter,
+                max: 1,
+                time: 10000,
+                errors: ['time']})
+                .then(message => {
+                    message = message.first();
+                    if (message.content.toLowerCase() === flagCodes[correct].toLowerCase()){
+                        message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
+                    } else{
+                        message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)])/* .concat(` ${flagCodes[correct]}`) */);
+                    }
+                    delete currentPlayers[message.author.id];
+                }).catch(e => {
+                    message.channel.send(`${message.author.toString()} - Times up!`);
+                    delete currentPlayers[message.author.id];
+                })
+            );
+        } catch(e) {
+            console.error(e);
+        }
+    } else{
+        message.channel.send(`${message.author.toString()} `.concat('You are already playing!'));
     }
-    
 }
 
 async function showHelp(message){
@@ -67,31 +103,6 @@ async function showHelp(message){
     )
     await message.channel.send({embeds: [embed]});
 }
-
-module.exports = {
-	name: 'messageCreate',
-	async execute(message) {
-        if (!message.content.toLowerCase().startsWith("f!")) return;
-        else{
-            // Separar Comando y Contenido en el mensaje
-            let stringArr = message.content.split(" ");
-            messageCommand = stringArr[0].substring(2).toLowerCase();
-            prefixLength = 2 + messageCommand.length;
-            // Ahora arguments es un string, pero en el futuro va a ser un array de strings para pasar varios argumentos
-            arguments = stringArr.slice(1).join(" ");
-
-            console.log('Command: ' + messageCommand);
-            console.log('Arguments: ' + arguments);
-
-            // Detectar comando y llamar función correspondiente
-            if (messageCommand == "hola") sayHello(messageConent);
-            else if (messageCommand == "reply") await replyWithHello(message, arguments);
-            else if (messageCommand == "flag") await sendFlag(message, arguments);
-            else if (messageCommand == "play") await playFlags(message);
-            else if (messageCommand == "help") await showHelp(message);
-        }
-	},
-};
 
 const flagCodes = {
     "ad": "Andorra",
@@ -356,3 +367,5 @@ const winMessages = [
 const failMessages = [
     "You failed LMAO! 😂",
 ]
+
+let currentPlayers = {}
