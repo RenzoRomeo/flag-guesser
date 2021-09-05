@@ -1,6 +1,15 @@
 const { Client, Intents, Collection } = require('discord.js');
 const { token } = require('./config.json');
 const fs = require('fs');
+const express = require('express');
+
+const app = express();
+const host = '0.0.0.0';
+const port = process.env.PORT || 3000;
+
+app.listen(port, host, function() {
+	console.log("App started on port ",port);
+});
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES]});
 
