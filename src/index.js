@@ -1,5 +1,5 @@
 const { Client, Intents, Collection } = require('discord.js');
-const { token } = require('./config.json');
+const { token } = require('../config.json');
 const fs = require('fs');
 const express = require('express');
 const MongoDb = require("./database/mongo-db.js");

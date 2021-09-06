@@ -1,5 +1,5 @@
 const Transaction = require("mongoose-transactions");
-const { connectionUri } = require("../config.json");
+const { connectionUri } = require("../../config.json");
 const transaction = new Transaction();
 const mongoose = require("mongoose");
 const UserSchema = require("./user-schema");
