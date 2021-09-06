@@ -152,8 +152,10 @@ async function showLeaderboard(message){
         messageValues.push({name: bruh.username.concat(`#${bruh.discriminator}`), value: leaderboard[user].toString()});
     }
 
+    console.log(messageValues);
+
     messageValues.sort((a, b) => {
-        return parseInt(a.value) > parseInt(b.value);
+        return parseInt(b.value) - parseInt(a.value);
     });
 
     let embed = new MessageEmbed()
