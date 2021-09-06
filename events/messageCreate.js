@@ -17,8 +17,8 @@ module.exports = {
             // Arguments es un array de strings
             arguments = stringArr.slice(1);
 
-            console.log('Command: ' + messageCommand);
-            console.log('Arguments: ' + arguments);
+            /* console.log('Command: ' + messageCommand);
+            console.log('Arguments: ' + arguments); */
 
             // Detectar comando y llamar función correspondiente
             if (messageCommand == "flag") await sendFlag(message, arguments);
