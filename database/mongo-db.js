@@ -24,7 +24,7 @@ class MongoDb{
 
         let newUser = new UserSchema({
             userId: userId,
-            guildId: guildId,
+            guildIds: [guildId],
             singleScore: 0,
             battleScore: 0
         });
@@ -56,7 +56,7 @@ class MongoDb{
 
     async getGuildLeaderboard(guildId, single){
         let leaderboard = {};
-        let users = await UserSchema.find({guilId: guildId});
+        let users = await UserSchema.find({guilIds: guildId});
         for (let user of users) leaderboard[user.userId] = (single) ? user.singleScore : user.battleScore;
         return leaderboard;
     }
