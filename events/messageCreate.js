@@ -153,7 +153,7 @@ async function showLeaderboard(message){
     }
 
     messageValues.sort((a, b) => {
-        return parseInt(a.value) < parseInt(b.value);
+        return parseInt(a.value) > parseInt(b.value);
     });
 
     let embed = new MessageEmbed()
