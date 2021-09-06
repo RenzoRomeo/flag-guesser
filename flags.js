@@ -143,7 +143,6 @@ flagCodes: {
     "mc": "Monaco",
     "md": "Moldova",
     "me": "Montenegro",
-    "mf": "Saint Martin",
     "mg": "Madagascar",
     "mh": "Marshall Islands",
     "mk": "North Macedonia",
@@ -295,7 +294,6 @@ flagCodesHard: {
     "lc": "Saint Lucia",
     "li": "Liechtenstein",
     "mc": "Monaco",
-    "mf": "Saint Martin",
     "mh": "Marshall Islands",
     "mk": "North Macedonia",
     "mm": "Myanmar",
@@ -345,7 +343,6 @@ flagCodesHard: {
     "ws": "Samoa",
     "xk": "Kosovo",
     "ye": "Yemen",
-    "yt": "Mayotte",
     "zm": "Zambia",
     "zw": "Zimbabwe"
 },
@@ -509,5 +506,6 @@ flagCodesEasy: {
     "va": "Vatican City",
     "ve": "Venezuela",
     "vn": "Vietnam",
+    "yt": "Mayotte",
     "za": "South Africa",
 }}
