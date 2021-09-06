@@ -43,7 +43,6 @@ class MongoDb{
 
     // Debe existir el usuario
     async updateUser(user){
-        console.log(user);
         await UserSchema.findOneAndUpdate({userId: user.userId}, user);
     }
 
