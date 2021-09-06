@@ -62,8 +62,10 @@ async function playFlags(message, arguments){
     let points;
 
     // Lógica dificultades
-    if (!difficulty) difficultyObject = Flags.flagCodes;
-    else if (difficulty == "e" || difficulty == "easy"){
+    if (!difficulty){
+        difficultyObject = Flags.flagCodes;
+        points = 1;
+    } else if (difficulty == "e" || difficulty == "easy"){
         difficultyObject = Flags.flagCodesEasy;
         points = 1;
     } else if (difficulty == "m" || difficulty == "medium"){
@@ -127,8 +129,10 @@ async function showHelp(message){
     .setTitle('Flag Guesser Help')
     .setDescription('List of commands')
     .addFields(
-        {name: 'f!play [easy/medium/hard]', value: 'Play Flag Guesser'},
-        {name: 'f!flag [country code/name]', value: "Show the country's flag "}
+        {name: 'f!play [easy(1pt)/medium(2pt)/hard(3pt)]', value: 'Play Flag Guesser'},
+        {name: 'f!flag [country code/name]', value: "Show the country's flag "},
+        {name: 'f!score', value: 'Show single player score'},
+        {name: 'f!leaderboard', value: "Show this server's leaderboard"}
     )
     await message.channel.send({embeds: [embed]});
 }
