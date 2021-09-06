@@ -35,6 +35,8 @@ class MongoDb{
     async updateUserScore(userId, guildId, addScore, single){
         let existentUser = await this.createUser(userId, guildId);
 
+        if (!existentUser.guildIds.includes(guildId)) existentUser.guildIds.push(guildId);
+
         if (single) existentUser.singleScore += addScore;
         else existentUser.battleScore += addScore;
 
