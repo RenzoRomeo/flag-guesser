@@ -273,7 +273,7 @@ flagCodesHard: {
     "cx": "Christmas Island",
     "dj": "Djibouti",
     "eh": "Western Sahara",
-    "fk": "Malvinas islands",
+    "fk": "Malvinas Islands",
     "fm": "Micronesia",
     "fo": "Faroe Islands",
     "gg": "Guernsey",
