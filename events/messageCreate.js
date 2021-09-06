@@ -1,5 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 const Flags = require("../flags.js");
+const MongoDb = require("../database/mongo-db.js");
+
+const mongoDb = new MongoDb();
 
 module.exports = {
 	name: 'messageCreate',
@@ -21,6 +24,8 @@ module.exports = {
             if (messageCommand == "flag") await sendFlag(message, arguments);
             else if (messageCommand == "play") await playFlags(message, arguments);
             else if (messageCommand == "help") await showHelp(message);
+            else if (messageCommand == "score") await showScore(message);
+            else if (messageCommand == "leaderboard") await showLeaderboard(message);
         }
 	},
 };
@@ -51,15 +56,23 @@ async function sendFlag(message, arguments){
 }
 
 async function playFlags(message, arguments){
-
     // Detecta dificultad y selecciona objeto correspondiente, si no hay dificultad selecciona todos los paises
     let difficulty = (arguments[0]) ? arguments[0].toLowerCase() : "";
     let difficultyObject = {};
+    let points;
+
+    // Lógica dificultades
     if (!difficulty) difficultyObject = Flags.flagCodes;
-    else if (difficulty == "easy") difficultyObject = Flags.flagCodesEasy;
-    else if (difficulty == "med" || difficulty == "medium") difficultyObject = Flags.flagCodesMedium;
-    else if (difficulty == "hard") difficultyObject = Flags.flagCodesHard;
-    else{
+    else if (difficulty == "e" || difficulty == "easy"){
+        difficultyObject = Flags.flagCodesEasy;
+        points = 1;
+    } else if (difficulty == "m" || difficulty == "medium"){
+        difficultyObject = Flags.flagCodesMedium;
+        points = 2;
+    } else if (difficulty == "h" || difficulty == "hard"){
+        difficultyObject = Flags.flagCodesHard
+        points = 3;
+    }else {
         message.channel.send(`${message.author.toString()} `.concat("Difficulty doesn't exist!"));
         return;
     }
@@ -86,12 +99,13 @@ async function playFlags(message, arguments){
                 max: 1,
                 time: 10000,
                 errors: ['time']})
-                .then(message => {
+                .then(async message => {
                     message = message.first();
                     if (message.content.toLowerCase() === difficultyObject[correct].toLowerCase()){
-                        message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)])/* .concat(` ${Flags.flagCodes[correct]}`) */);
+                        message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)]));
+                        mongoDb.updateUserScore(message.author.id.toString(), message.guild.id.toString(), points, true);
                     } else{
-                        message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)])/* .concat(` ${Flags.flagCodes[correct]}`) */);
+                        message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)]));
                     }
                     delete currentPlayers[message.author.id];
                 }).catch(e => {
@@ -113,9 +127,40 @@ async function showHelp(message){
     .setTitle('Flag Guesser Help')
     .setDescription('List of commands')
     .addFields(
-        {name: 'f!play', value: 'Play Flag Guesser'},
+        {name: 'f!play [easy/medium/hard]', value: 'Play Flag Guesser'},
         {name: 'f!flag [country code/name]', value: "Show the country's flag "}
     )
+    await message.channel.send({embeds: [embed]});
+}
+
+async function showScore(message){
+    let playerScore = await mongoDb.getUserScore(message.author.id, true);
+    if (!playerScore){
+        message.channel.send(`${message.author.toString()} `.concat("You haven't played any games yet!"));
+        return;
+    } else{
+        message.channel.send(`${message.author.toString()} `.concat(`Your single player score is ${playerScore}!`));
+    }
+}
+
+async function showLeaderboard(message){
+    let leaderboard = await mongoDb.getGuildLeaderboard(message.guild.id.toString(), true);
+    let messageValues = [];
+
+    for (let user in leaderboard){
+        let bruh = message.guild.members.cache.get(user).user;
+        messageValues.push({name: bruh.username.concat(`#${bruh.discriminator}`), value: leaderboard[user].toString()});
+    }
+
+    messageValues.sort((a, b) => {
+        return -a.value.localeCompare(b.value);
+    });
+
+    let embed = new MessageEmbed()
+    .setColor('#0099ff')
+    .setTitle('Flag Guesser Leaderboard')
+    .setDescription('Player List')
+    .addFields(...messageValues);
     await message.channel.send({embeds: [embed]});
 }
 
