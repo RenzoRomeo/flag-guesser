@@ -39,7 +39,7 @@ function getKeyByValue(object, value) {
 }
 
 async function sendFlag(message, arguments){
-    country = arguments[0];
+    country = arguments.join(" ");
     if (!isPlaying(message.author.id)){
         if (!((country in Flags.flagCodes) || (Object.values(Flags.flagCodes).map(s => s.toLowerCase())).includes(country.toLowerCase()))){
             await message.channel.send("Invalid country code/name!");
