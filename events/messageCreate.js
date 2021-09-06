@@ -88,7 +88,7 @@ async function playFlags(message, arguments){
         const correct = Object.keys(difficultyObject)[Math.floor(Math.random() * Object.keys(difficultyObject).length)];
 
         // Filtro para awaitMessages, espera respuesta del autor original
-        let filter = m => (m.author.id === message.author.id && isPlaying(m.author.id) && !['f!play', 'f!flag'].includes(m.content.toLowerCase().split(" ")[0]));
+        let filter = m => (m.author.id === message.author.id && isPlaying(m.author.id) && !['f!play', 'f!flag', 'f!leaderboard', 'f!help', 'f!score'].includes(m.content.toLowerCase().split(" ")[0]));
         let correctLength = difficultyObject[correct].split(" ").length;
 
         try{
