@@ -47,7 +47,7 @@ async function sendFlag(message, arguments){
             if (!(country in Flags.flagCodes)) country = getKeyByValue(Flags.flagCodes,country.toLowerCase());
             await message.channel.send({
                 files:[`https://flagcdn.com/256x192/${country}.png`],
-                content: `${Flags.flagCodes[country]}'s flag`,
+                content: `${message.author.toString()} - ${Flags.flagCodes[country]}'s flag`,
             });
         }
     } else{
