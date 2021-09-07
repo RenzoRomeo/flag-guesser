@@ -156,26 +156,25 @@ async function showLeaderboard(message){
     let guildUsers = [];
     for (let u of await message.guild.members.list({limit: 100})) guildUsers.push(u[0]);
     let leaderboard = await mongoDb.getGuildLeaderboard(message.guildId.toString(), guildUsers, true);
-    let messageValues = [];
+    let values = [];
 
     for (let user in leaderboard){
         let bruh = message.guild.members.cache.get(user).user;
-        /* messageValues.push({name: bruh.username.concat(`#${bruh.discriminator}`).concat(` ${leaderboard[user].toString()}`), value: "\u200b"}); */
-        messageValues.push({name: "\u200b", value: bruh.username.concat(`#${bruh.discriminator}`).concat(` - ${leaderboard[user].toString()}`)})
+        values.push(bruh.username.concat(`#${bruh.discriminator}`).concat(` - ${leaderboard[user].toString()}`));
     }
 
-    messageValues.sort((a, b) => {
-        return parseInt(b.value.split(" ")[b.value.split(" ").length-1]) - parseInt(a.value.split(" ")[a.value.split(" ").length-1]);
-    });
+    values.sort((a, b) => {
+        return parseInt(b.split(" ")[b.split(" ").length-1]) - parseInt(a.split(" ")[a.split(" ").length-1]); 
+    })
 
-    for (let i in messageValues){
-        messageValues[i].value = `${(parseInt(i)+1)} - ` + messageValues[i].value;
+    for (let i in values){
+        values[i] = `**${(parseInt(i)+1)}.** ${values[i]}`
     }
 
     let embed = new MessageEmbed()
     .setColor(embedColor)
     .setAuthor(`${message.guild.name}'s Leaderboard`, message.guild.iconURL())
-    .addFields(...messageValues);
+    .addFields({name: "\u200b", value: values.join('\n')})
     await message.channel.send({embeds: [embed]});
 }
 
