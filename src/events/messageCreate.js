@@ -66,6 +66,10 @@ async function playFlags(message, arguments){
     let difficultyObject = {};
     let points;
 
+    let embed = new MessageEmbed()
+    .setColor(embedColor)
+    .setTitle(`${message.author.username}#${message.author.discriminator}`)
+
     // Lógica dificultades
     if (!difficulty){
         difficultyObject = Flags.flagCodes;
@@ -80,7 +84,7 @@ async function playFlags(message, arguments){
         difficultyObject = Flags.flagCodesHard
         points = 3;
     }else {
-        message.channel.send(`${message.author.toString()} `.concat("Difficulty doesn't exist!"));
+        await message.channel.send({embeds: [embed.setDescription("Difficulty doesn't exist!")]});
         return;
     }
 
@@ -97,10 +101,9 @@ async function playFlags(message, arguments){
         let correctLength = difficultyObject[correct].split(" ").length;
 
         try{
-            await message.channel.send({
-                files:[`https://flagcdn.com/256x192/${correct}.png`],
-                content: `${message.author.toString()} Guess this country's name! - Hint: ${correctLength} word${(correctLength>1) ? 's' : ''} - You have 10 seconds!`
-            })
+            await message.channel.send({embeds: [embed.setDescription(`Guess this country's name!\nHint: ||${correctLength} word${(correctLength>1) ? 's' : ''}||\n`)
+            .setFooter("You have 10 seconds!")
+            .setImage(`https://flagcdn.com/256x192/${correct}.png`)]})
             .then(message.channel.awaitMessages({
                 filter,
                 max: 1,
@@ -109,14 +112,14 @@ async function playFlags(message, arguments){
                 .then(async message => {
                     message = message.first();
                     if (message.content.toLowerCase() === difficultyObject[correct].toLowerCase()){
-                        message.channel.send(`${message.author.toString()} `.concat(winMessages[Math.floor(Math.random() * winMessages.length)]));
+                        message.channel.send({embeds: [embed.setFooter("").setImage("").setDescription(``.concat(winMessages[Math.floor(Math.random() * winMessages.length)]))]})
                         mongoDb.updateUserScore(message.author.id.toString(), message.guild.id.toString(), points, true);
                     } else{
-                        message.channel.send(`${message.author.toString()} `.concat(failMessages[Math.floor(Math.random() * failMessages.length)]));
+                        message.channel.send({embeds: [embed.setFooter("").setImage("").setDescription(``.concat(failMessages[Math.floor(Math.random() * failMessages.length)]))]})
                     }
                     delete currentPlayers[message.author.id];
                 }).catch(e => {
-                    message.channel.send(`${message.author.toString()} - Times up!`);
+                    message.channel.send({embeds: [embed.setFooter("").setImage("").setDescription(`Times up!`)]})
                     delete currentPlayers[message.author.id];
                 })
             );
@@ -124,7 +127,7 @@ async function playFlags(message, arguments){
             console.error(e);
         }
     } else{
-        message.channel.send(`${message.author.toString()} `.concat('You are already playing!'));
+        message.channel.send({embeds: [embed.setImage("").setDescription(``.concat('You are already playing!'))]})
     }
 }
 
@@ -144,11 +147,14 @@ async function showHelp(message){
 
 async function showScore(message){
     let playerScore = await mongoDb.getUserScore(message.author.id, true);
+    let embed = new MessageEmbed()
+    .setColor(embedColor)
+    .setTitle(`${message.author.username}#${message.author.discriminator}`)
+
     if (!playerScore){
-        message.channel.send(`${message.author.toString()} `.concat("You haven't played any games yet!"));
-        return;
+        message.channel.send({embeds: [embed.setDescription(``.concat("You haven't played any games yet!"))]});
     } else{
-        message.channel.send(`${message.author.toString()} `.concat(`Your single player score is ${playerScore}!`));
+        message.channel.send({embeds: [embed.setDescription(``.concat(`Your single player score is ${playerScore}`))]});
     }
 }
 
