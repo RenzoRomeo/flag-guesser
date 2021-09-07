@@ -4,6 +4,8 @@ const MongoDb = require("../database/mongo-db.js");
 
 const mongoDb = new MongoDb();
 
+const embedColor = "#0099ff";
+
 module.exports = {
 	name: 'messageCreate',
 	async execute(message) {
@@ -39,17 +41,20 @@ function getKeyByValue(object, value) {
 }
 
 async function sendFlag(message, arguments){
+    let embed = new MessageEmbed()
+    .setColor(embedColor)
+    .setTitle(`${message.author.username}#${message.author.discriminator}`)
+
     country = arguments.join(" ");
     if (!isPlaying(message.author.id)){
         if (!((country in Flags.flagCodes) || (Object.values(Flags.flagCodes).map(s => s.toLowerCase())).includes(country.toLowerCase()))){
-            await message.channel.send("Invalid country code/name!");
+            embed.setDescription("Invalid country code/name!")
         } else{
             if (!(country in Flags.flagCodes)) country = getKeyByValue(Flags.flagCodes,country.toLowerCase());
-            await message.channel.send({
-                files:[`https://flagcdn.com/256x192/${country}.png`],
-                content: `${message.author.toString()} - ${Flags.flagCodes[country]}'s flag`,
-            });
+            embed.setDescription(`${Flags.flagCodes[country]}'s flag`)
+            .setImage(`https://flagcdn.com/256x192/${country}.png`);
         }
+        await message.channel.send({embeds: [embed]});
     } else{
         await message.channel.send(`${message.author.toString()} - You can't use that command while playing!`);
     }
@@ -125,7 +130,7 @@ async function playFlags(message, arguments){
 
 async function showHelp(message){
     let embed = new MessageEmbed()
-    .setColor('#0099ff')
+    .setColor(embedColor)
     .setTitle('Flag Guesser Help')
     .setDescription('List of commands')
     .addFields(
@@ -155,17 +160,21 @@ async function showLeaderboard(message){
 
     for (let user in leaderboard){
         let bruh = message.guild.members.cache.get(user).user;
-        messageValues.push({name: bruh.username.concat(`#${bruh.discriminator}`), value: leaderboard[user].toString()});
+        /* messageValues.push({name: bruh.username.concat(`#${bruh.discriminator}`).concat(` ${leaderboard[user].toString()}`), value: "\u200b"}); */
+        messageValues.push({name: "\u200b", value: bruh.username.concat(`#${bruh.discriminator}`).concat(` - ${leaderboard[user].toString()}`)})
     }
 
     messageValues.sort((a, b) => {
-        return parseInt(b.value) - parseInt(a.value);
+        return parseInt(b.value.split(" ")[b.value.split(" ").length-1]) - parseInt(a.value.split(" ")[a.value.split(" ").length-1]);
     });
 
+    for (let i in messageValues){
+        messageValues[i].value = `${(parseInt(i)+1)} - ` + messageValues[i].value;
+    }
+
     let embed = new MessageEmbed()
-    .setColor('#0099ff')
-    .setTitle('Flag Guesser Leaderboard')
-    .setDescription('Player List')
+    .setColor(embedColor)
+    .setAuthor(`${message.guild.name}'s Leaderboard`, message.guild.iconURL())
     .addFields(...messageValues);
     await message.channel.send({embeds: [embed]});
 }
