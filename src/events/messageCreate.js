@@ -148,7 +148,9 @@ async function showScore(message){
 }
 
 async function showLeaderboard(message){
-    let leaderboard = await mongoDb.getGuildLeaderboard(message.guild.id.toString(), true);
+    let guildUsers = [];
+    for (let u of await message.guild.members.list({limit: 100})) guildUsers.push(u[0]);
+    let leaderboard = await mongoDb.getGuildLeaderboard(message.guildId.toString(), guildUsers, true);
     let messageValues = [];
 
     for (let user in leaderboard){

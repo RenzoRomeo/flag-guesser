@@ -56,9 +56,9 @@ class MongoDb{
         return (single) ? existentUser.singleScore : existentUser.battleScore;
     }
 
-    async getGuildLeaderboard(guildId, single){
+    async getGuildLeaderboard(guildId, guildUsers, single){
         let leaderboard = {};
-        let users = await UserSchema.find({guilIds: guildId});
+        let users = await UserSchema.find({$or:[{guildIds: guildId}, {userId: {$in: [...guildUsers]}}]});
         for (let user of users) leaderboard[user.userId] = (single) ? user.singleScore : user.battleScore;
         return leaderboard;
     }
